@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 
-use crate::core::*;
-use crate::core::TimingPlugin;
-
+use crate::core::timing::TimingPlugin;
 pub struct CorePlugin;
 
 impl Plugin for CorePlugin {
