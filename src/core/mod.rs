@@ -1,4 +1,4 @@
-mod timing;
+pub mod timing;
 mod plugin;
 
 
