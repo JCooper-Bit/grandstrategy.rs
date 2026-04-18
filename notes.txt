@@ -1,0 +1,7 @@
+TODO:
+Convert time system to a single count (converted into d/m/y for display only)
+Event groups
+Repeating Events (every x days)
+Saving/Loading
+Refactor current code
+Debugging system
