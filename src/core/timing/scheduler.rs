@@ -24,7 +24,8 @@ impl Scheduler {
         year: u32,
         callback: String,
     ) {
-        println!("[RUST API] Scheduling event: {}", id);
+
+        println!("[RUST API] Scheduling event: {} for {}/{}/{}", id, day, month, year);
         self.events.push(ScheduledEvent {
             id,
             day,
@@ -41,35 +42,28 @@ impl Scheduler {
             self.events.remove(pos.unwrap());
         }
     }
-    pub fn schedule_in_n_days(&mut self, n: u32, callback: String, t: &Res<GameTime>) {
+    pub fn schedule_in_n_days(&mut self, id: String, n: u32, callback: String, t: &Res<GameTime>) {
         let day: u32;
         let month: u32;
         let year: u32;
 
         if t.day + n <= DAYS_IN_MONTH {
-            day = t.day;
+            day = t.day + n;
             month = t.month;
         }
         else {
             day = t.day + n - DAYS_IN_MONTH;
+            // todo: Fix for month gap > 1 (generalize for x)
             month = t.month + 1;
         }
 
         if month > MONTHS_IN_YEAR {
+            // todo: Fix for yea gap > 1 (generalize for x)
             year = t.year + 1
         }
         else {
             year = t.year
         }
-
-        let id = format!(
-            "{}_{}_{}_{}_{}",
-            callback,
-            year,
-            month,
-            day,
-            uuid::Uuid::new_v4().simple()
-        );
         self.schedule(id, day, month, year, callback);
     }
 
@@ -85,14 +79,14 @@ pub fn process_schedule_commands(
 
     for cmd in commands.drain(..) {
         match cmd {
-            LuaCommand::Schedule { id, day, month, year, callback } => {
+            LuaCommand::Schedule {id, day, month, year, callback } => {
                 scheduler.schedule(id, day, month, year, callback);
             }
 
             LuaCommand::Cancel { id } => {
                 scheduler.cancel(id);
             }
-            LuaCommand::ScheduleInNDays { id, n, callback} => {
+            LuaCommand::ScheduleInNDays {id, n, callback} => {
                 scheduler.schedule_in_n_days(id, n, callback, &t)
             }
             

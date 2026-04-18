@@ -3,7 +3,7 @@ use std::{sync::Mutex};
 use bevy::prelude::*;
 use mlua::{Lua, Function};
 
-
+#[derive(Debug)]
 pub enum LuaCommand {
     Schedule {
         id: String,
@@ -70,23 +70,19 @@ impl LuaState {
                 let mut cmds = schedule_commands.lock().unwrap();
 
                 let id = format!(
-                    "{}_{}_{}_{}_{}",
+                    "{}_{}",
                     callback,
-                    year,
-                    month,
-                    day,
                     uuid::Uuid::new_v4().simple()
                 );
-
+                let idc = id.clone();
                 cmds.push(LuaCommand::Schedule {
-                    id: id.clone(),
+                    id,
                     day,
                     month,
                     year,
                     callback,
                 });
-
-                Ok(id)
+                Ok((idc))
             },
         ).unwrap();
 
@@ -111,14 +107,23 @@ impl LuaState {
 
         let sched_n_days_commands = commands.clone();
 
-        let schedule_in_n_days = self.lua.create_function(|lua, (n, callback)| {
-            
-            
-            Ok()
+        let schedule_in_n_days = self.lua.create_function(move |_lua, (n, callback): (u32, String)| {
+            let mut cmds = sched_n_days_commands.lock().unwrap();
+
+            let id = format!(
+                "{}_{}",
+                callback,
+                uuid::Uuid::new_v4().simple()
+            );
+            let idc = id.clone();
+            cmds.push(LuaCommand::ScheduleInNDays {id, n, callback});
+            Ok((idc))
         }).unwrap();
 
         game.set("log", log).unwrap();
+
         events.set("schedule", schedule).unwrap();
+        events.set("schedule_in_n_days", schedule_in_n_days).unwrap();
         events.set("cancel", cancel).unwrap();
         
         globals.set("Game", game).unwrap();

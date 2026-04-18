@@ -8,8 +8,7 @@ pub struct TimingPlugin;
 impl Plugin for TimingPlugin {
     fn build(&self, app: &mut App) {
         app
-            // ---- CORE TIME STATE ----
-            .insert_resource(GameTime::default())
+             .insert_resource(GameTime::default())
             .insert_resource(GameSpeed::Fast)
             .insert_resource(TickTimer {
                 timer: Timer::from_seconds(1.0, TimerMode::Repeating),
